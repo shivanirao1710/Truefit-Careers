@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Job Role Recommendation System</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Job Role Recommendation System</h1>
+        
+        <!-- Form to search by either skills or job role -->
+        <form method="POST">
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="search_type" value="skills" {% if search_type == 'skills' %}checked{% endif %}>
+                    Search by Skills
+                </label>
+                <label>
+                    <input type="radio" name="search_type" value="job_role" {% if search_type == 'job_role' %}checked{% endif %}>
+                    Search by Job Role
+                </label>
+                <label>
+                    <input type="radio" name="search_type" value="company_name" {% if search_type == 'company_name' %}checked{% endif %}>
+                    Search by Company 
+                </label>
+            </div>
+            
+            <input type="text" name="skills" placeholder="Enter Skills, Job Role, or Company Name" required value="{{ request.form.get('skills', '') }}">
+            <button type="submit">Get Recommendations</button>
+        </form>
+        
+
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+
+        {% if recommendations %}
+            <h2>Recommended Jobs:</h2>
+            <ul>
+                {% for job in recommendations %}
+                    <li>
+                        <a href="{{ url_for('job_details', job_role=job['job_role'], company_name=job['company_name']) }}">
+                            <b>{{ job["job_role"] }}</b> at {{ job["company_name"] }} ({{ job["company_type"] }})
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            {% if search_type == 'skills' %}
+                <p>No recommendations found for the entered skills. Try modifying the input or using different skills.</p>
+            {% elif search_type == 'job_role' %}
+                <p>No recommendations found for the entered job role. Try modifying the input or using different job titles.</p>
+            {% endif %}
+        {% endif %}
+        <br>
+        <a href="{{ url_for('reset') }}" class="btn">Reset Search</a><br><br>
+
+        <!-- Chatbot Button -->
+        <div style="margin-top: 20px;">
+            <a href="{{ url_for('home') }}" class="btn">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resume Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Resume Details</h2>
+        <div class="resume-table">
+            <table class="table table-bordered">
+                <tr>
+                    <th>Name</th>
+                    <td>{{ resume[2] }}</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>{{ resume[3] }}</td>
+                </tr>
+                <tr>
+                    <th>Phone</th>
+                    <td>{{ resume[4] }}</td>
+                </tr>
+                <tr>
+                    <th>Skills</th>
+                    <td>{{ resume[5] }}</td>
+                </tr>
+                <tr>
+                    <th>Experience</th>
+                    <td>{{ resume[6] }}</td>
+                </tr>
+                <tr>
+                    <th>Education</th>
+                    <td>{{ resume[7] }}</td>
+                </tr>
+                <tr>
+                    <th>Projects</th>
+                    <td>{{ resume[8] }}</td>
+                </tr>
+                <tr>
+                    <th>File Name</th>
+                    <td>{{ resume[9] }}</td>
+                </tr>
+                <tr>
+                    <th>Insights</th>
+                    <td>{{ resume[10] }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Buttons (Properly Positioned Below the Table) -->
+        <div class="button-container">
+            <button id="getJobsBtn" class="btn btn-primary">Get Jobs</button><br><br>
+        </div>
+
+        <!-- Job Recommendations -->
+        <div id="jobResults" class="jobs-list"></div>
+        <a href="/home" class="btn btn-secondary">Back to Home</a>
+    </div>
+
+    <script>
+        document.getElementById("getJobsBtn").addEventListener("click", function() {
+            fetch("/get_jobs")
+                .then(response => response.json())
+                .then(data => {
+                    const jobResults = document.getElementById("jobResults");
+                    if (data.jobs.length === 0) {
+                        jobResults.innerHTML = "<p>No job recommendations found!</p>";
+                        return;
+                    }
+
+                    let list = `
+                        <h3>Recommended Jobs</h3>
+                        <ul class="job-list">
+                    `;
+
+                    data.jobs.forEach(job => {
+                        list += `
+                            <li class="job-item">
+                                <strong>Job Role:</strong> ${job.job_role}<br>
+                                <strong>Company:</strong> ${job.company_name} (${job.company_type})<br>
+                                <strong>Skills:</strong> ${job.skills}<br>
+                                <strong>Relevance Score:</strong> ${job.relevance_score}%<br>
+                                <strong style="color: green;">Matched Skills:</strong> ${job.matched_skills}<br>
+                               <strong style="color: red;">Missing Skills:</strong> ${job.missing_skills}<br>
+                            </li>
+                        `;
+                    });
+
+                    list += "</ul>";
+                    jobResults.innerHTML = list;
+                })
+                .catch(error => {
+                    console.error("Error fetching jobs:", error);
+                    alert("Failed to fetch job recommendations!");
+                });
+        });
+    </script>
+</body>
+</html>

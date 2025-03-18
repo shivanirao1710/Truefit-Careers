@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="home-page">
+        <h2>Welcome to Home Page</h2>
+        <div class="button-container">
+            <a href="{{ url_for('upload') }}" class="bttn">Resume Analyzer</a>  <!-- This points to the 'upload' route -->
+            <a href="{{ url_for('search') }}" class="bttn">Find Jobs</a>
+            <a href="{{ url_for('chatbot_route') }}" class="bttn">Chatbot</a>
+            <a href="/home" class="bttn">Button 4</a>
+        </div>
+        <br>
+        <div class="button-containers">
+            <a href="/home" class="btton">Main Function</a>
+        </div><br><br>
+        <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Parser</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="upload-form">
+        <h2>Upload Your Resume</h2>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+            <button type="submit">Upload</button>
+        </form>
+        <br><br>
+        <a href="/display" class="btn">View My Resume</a>
+        <br><br>
+        <!-- Add a "Back to Home" button -->
+        <a href="{{ url_for('home') }}" class="btn">Back to Home</a>
+    </div>
+</body>
+</html>
