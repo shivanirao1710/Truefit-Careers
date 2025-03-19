@@ -7,13 +7,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    
     <div class="home-page">
+        <div class="button-container">
+            <a href="{{ url_for('profile') }}" class="bttoon">Profile</a>
+        </div>
         <h2>Welcome to Home Page</h2>
         <div class="button-container">
             <a href="{{ url_for('upload') }}" class="bttn">Resume Analyzer</a>  <!-- This points to the 'upload' route -->
             <a href="{{ url_for('search') }}" class="bttn">Find Jobs</a>
             <a href="{{ url_for('chatbot_route') }}" class="bttn">Chatbot</a>
-            <a href="/home" class="bttn">Button 4</a>
+            <a href="/home" class="bttn">Behavior Analyzer</a>
         </div>
         <br>
         <div class="button-containers">

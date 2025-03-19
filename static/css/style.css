@@ -37,7 +37,6 @@ h3 {
 p {
     text-align: left;
 }
-
 /* Form Containers */
 .home-page, .upload-form, .container {
     text-align: center;
@@ -110,6 +109,7 @@ button, .btn {
     font-weight: 600;
     transition: background-color 0.3s ease, transform 0.2s ease-in-out;
     margin-top: 20px;
+    text-decoration: none;
 }
 
 button:hover, .btn:hover {
@@ -135,11 +135,12 @@ button:focus, .btn:focus {
     border: none;
     border-radius: 16px;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 25px;
     font-weight: 600;
     transition: background-color 0.3s ease, transform 0.2s ease-in-out, box-shadow 0.3s ease;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     text-align: center;
+    text-decoration: none;
 }
 
 .bttn:hover {
@@ -176,6 +177,7 @@ button:focus, .btn:focus {
     align-items: center; /* Vertically center content */
     justify-content: center; /* Horizontally center content */
     text-align: center;
+    text-decoration: none;
 }
 .btton:hover {
     background-color: #5E35B1;
@@ -184,6 +186,32 @@ button:focus, .btn:focus {
 }
 
 .btton:active {
+    transform: translateY(0);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.bttoon {
+    width: 100px;  /* Set a specific width */
+    padding: 10px 5px;  /* Keep the padding consistent */
+    background-color: #ff4d4d;
+    color: #fff;
+    border: none;
+    border-radius: 70px;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease-in-out, box-shadow 0.3s ease;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    text-decoration: none;
+}
+.bttoon:hover {
+    background-color: #690101;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.bttoon:active {
     transform: translateY(0);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
@@ -215,7 +243,24 @@ button:focus, .btn:focus {
     background-color: #2980b9;
     color: white;
 }
+/* Profile */
+.profile-info {
+    background-color: white;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
+.profile-info p {
+    font-size: 1.2em;
+    color: #444;
+    margin: 10px 0;
+}
+
+.profile-info strong {
+    color: #007BFF; /* Blue for labels */
+}
 /* Lists and Items */
 ul {
     list-style: none;

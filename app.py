@@ -363,7 +363,51 @@ def chatbot_route():
         return render_template("chatbot.html", user_input=user_input, response=response)
     
     return render_template("chatbot.html", user_input="", response="Ask me about job roles, skills, or any other questions!")
+def get_resume_data(user_id):
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
 
+        # Query to get the resume details using the user_id
+        query = "SELECT resume_id, name, email, skills, education, insights FROM resumes WHERE user_id = %s"
+        cursor.execute(query, (user_id,))
+        result = cursor.fetchone()
+
+        # Close the connection
+        cursor.close()
+        connection.close()
+
+        # If data is found, return it as a dictionary
+        if result:
+            return {
+                'resume_id': result[0],
+                'name': result[1],
+                'email': result[2],
+                'skills': result[3],
+                'education': result[4],
+                'insights': result[5]
+            }
+        else:
+            return None
+
+    except Exception as e:
+        print("Error fetching data: ", e)
+        return None
+
+# Route to display the profile page
+@app.route('/profile')
+def profile():
+    # Check if user_id exists in session
+    if 'user_id' not in session:
+        return redirect(url_for('login'))  # Redirect to login if not logged in
+
+    user_id = session['user_id']  # Get user_id from session
+    resume_data = get_resume_data(user_id)
+    
+    if resume_data:
+        return render_template('profile.html', data=resume_data)
+    else:
+        return "Profile not found!", 404
 
 # Home Route for search functionality
 @app.route("/search", methods=["GET", "POST"])
@@ -453,8 +497,6 @@ def register():
         return redirect(url_for('home'))
     
     return render_template('register.html')
-
-# Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -469,11 +511,11 @@ def login():
         if user and user[2] == password:  # user[2] is the password column
             session['user_id'] = user[0]  # user[0] is the user ID
             conn.close()
-            return redirect(url_for('home'))
+            return redirect(url_for('home'))  # Redirect to the home page after successful login
         else:
             flash("Invalid credentials. Please try again.")
             conn.close()
-    
+
     return render_template('login.html')
 
 # Upload and parse resume
