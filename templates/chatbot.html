@@ -7,7 +7,7 @@
     <title>Chatbot</title>
 </head>
 <body>
-    <div class="container">
+    <div class="upload-form">
         <h1>Chatbot</h1>
         <form method="POST">
             <label for="user_input">You:</label>
@@ -17,7 +17,7 @@
 
         {% if user_input %}
             <p><strong>You:</strong> {{ user_input }}</p>
-            <p><strong>Bot:</strong> {{ response }}</p>
+            <p class="response-box"><strong>Bot:</strong> {{ response }}</p>
         {% endif %}
         <br>
         <a href="{{ url_for('home') }}" class="btn">Back to Home</a>

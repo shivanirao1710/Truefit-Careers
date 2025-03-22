@@ -304,65 +304,88 @@ def correct_grammar_and_generate_response(text):
 
 def extract_job_role_from_input(user_input):
     """Extract job role from the user's input."""
-    job_role_keywords = ["tell me about", "what is", "role of", "job of", "describe", "give me information about"]
-    for keyword in job_role_keywords:
-        if user_input.lower().startswith(keyword):
-            return user_input[len(keyword):].strip()
+    # Remove unnecessary words to isolate the role
+    keywords = ["tell me about", "what is", "role of", "job of", "job role for", "describe", "give me information about", "skills needed for"]
+    for keyword in keywords:
+        if keyword in user_input.lower():
+            return user_input.lower().replace(keyword, "").strip()
+    return user_input.strip()
+
+def extract_skills_from_input(user_input):
+    """Extract skills from the user's input."""
+    keywords = ["skills needed for", "skills required for", "technologies for", "tools for"]
+    for keyword in keywords:
+        if keyword in user_input.lower():
+            return user_input.lower().replace(keyword, "").strip()
     return user_input.strip()
 
 
+def find_job_roles_by_skill(skills_query):
+    job_info = get_job_data_from_postgresql()
+    recommended_jobs = []
+
+    for job in job_info:
+        # Convert job skills to a set of lowercased words
+        job_skills = set(job['skills_cleaned'].lower().split(", "))
+        query_skills = set(skills_query.lower().split(", "))
+        
+        # Check for intersection between job skills and query skills
+        matching_skills = job_skills.intersection(query_skills)
+        
+        # If there are matching skills, add the job to the recommended list
+        if matching_skills:
+            recommended_jobs.append(job)
+
+    return recommended_jobs
 @app.route("/chatbot", methods=["GET", "POST"])
 def chatbot_route():
-    """Handle chatbot interaction"""
     if request.method == "POST":
         user_input = request.form.get("user_input", "").strip()
-        
+
         if not user_input:
             return render_template("chatbot.html", user_input=user_input, response="Please ask me something!")
 
-        # Check if the user is asking about job roles
-        job_role_keywords = ['job', 'role', 'position', 'career']
-        skills_keywords = ['skills', 'technology', 'tools']
-
+        job_info = get_job_data_from_postgresql()
         response = ""
 
-        # If the user input contains keywords related to job roles
-        if any(keyword in user_input.lower() for keyword in job_role_keywords):
+        # Check if the user is asking about job roles
+        if any(keyword in user_input.lower() for keyword in ["job", "role", "position", "career", "skills needed for"]):
             job_role = extract_job_role_from_input(user_input)
-            job_info = get_job_data_from_postgresql()
-            job_details = next((job for job in job_info if job['job_role'].lower() == job_role), None)
-            
-            if job_details:
-                response = f"Job Role: {job_details['job_role']} at {job_details['company_name']}\n"
-                response += f"Skills Needed: {job_details['skills_cleaned']}\n"
-                response += f"Knowledge Required: {job_details['knowledge_cleaned']}\n"
-                response += f"Company Type: {job_details['company_type']}\n"
-                response += f"Description: {job_details.get('combined_features', 'No description available')}"
+            matching_jobs = [job for job in job_info if job_role.lower() in job['job_role'].lower()]
+
+            if matching_jobs:
+                response = f"Here are some roles related to '{job_role}':\n"
+                for job in matching_jobs[:3]:  # Limit to 3 results
+                    response += (
+                        f"- {job['job_role']} at {job['company_name']} "
+                        f"(Skills Needed: {job['skills_cleaned']})\n"
+                    )
             else:
-                response = f"Sorry, I couldn't find details for the job role '{job_role}'. Can you try another one?"
-        
-        # If the user input contains keywords related to skills
-        elif any(keyword in user_input.lower() for keyword in skills_keywords):
-            skills_query = user_input.lower().strip()
-            recommended_jobs = find_job_roles_by_skills(skills_query)
-            
+                response = f"Sorry, I couldn't find any roles related to '{job_role}'."
+        # Check if the user is asking about skills
+        elif any(keyword in user_input.lower() for keyword in ["skills", "technology","skill", "tools"]):
+            skills_query = extract_skills_from_input(user_input)
+            recommended_jobs = find_job_roles_by_skill(skills_query)
+
             if recommended_jobs:
                 response = "I found some jobs related to the skills you're looking for:\n"
-                for job in recommended_jobs:
-                    response += f"- {job['job_role']} at {job['company_name']} (Skills Needed: {job['skills_cleaned']})\n"
+                for job in recommended_jobs[:3]:  # Limit to 3 jobs for brevity
+                    response += (
+                        f"- {job['job_role']} at {job['company_name']} "
+                        f"(Skills Needed: {job['skills_cleaned']})\n"
+                    )
             else:
-                response = f"I couldn't find any jobs with the skills '{skills_query}'. Can you try different skills?"
-
-        # General conversation: Use the chatbot for free-form conversations
+                response = f"I couldn't find any jobs with the skills '{skills_query}'. Try different skills."
+        
+# General conversation: Use the chatbot for free-form conversations
         else:
             response = chatbot(user_input, max_length=50, num_return_sequences=1)[0]['generated_text']
-        
-        # Use GPT-2 to correct grammar and rephrase the response
-        response = correct_grammar_and_generate_response(response)
-        
+            response = correct_grammar_and_generate_response(response)
+
         return render_template("chatbot.html", user_input=user_input, response=response)
-    
-    return render_template("chatbot.html", user_input="", response="Ask me about job roles, skills, or any other questions!")
+
+    return render_template("chatbot.html", user_input="", response="Ask me about job roles, skills, or anything else!")
+
 def get_resume_data(user_id):
     try:
         connection = get_db_connection()

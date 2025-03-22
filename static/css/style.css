@@ -1,10 +1,14 @@
 /* Global Styles */
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: 'Lora', serif;
     margin: 0;
     padding: 20px;
-    background-color: #a2c2f3;
-    color: #444444;
+    background: linear-gradient(135deg, #d393fa, #f8f8f8); /* Soft purple-pink gradient */
+    color: #3A3A3A; /* Dark gray for text */
     line-height: 1.6;
     display: flex;
     justify-content: center;
@@ -14,10 +18,11 @@ body {
 }
 
 h1, h2, h3 {
-    color: #102d47;
+    color: #4A2C6A; /* Deep purple for headings */
     text-align: center;
     font-weight: 700;
     margin-bottom: 20px;
+    animation: fadeInDown 0.8s ease-in-out;
 }
 
 h1 {
@@ -27,32 +32,49 @@ h1 {
 
 h2 {
     font-size: 2rem;
-    color: #3F51B5;
+    color: #6A4C93; /* Medium purple */
 }
 
 h3 {
     font-size: 1.8rem;
-    color: #2b3d4f;
+    color: #8E6DBE; /* Light purple */
 }
+
 p {
     text-align: left;
+    line-height: 1.8;
 }
+
+@keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Form Containers */
 .home-page, .upload-form, .container {
     text-align: center;
     padding: 40px;
-    background-color: #ffffff;
+    background-color: #FFFFFF;
     border-radius: 20px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease, transform 0.3s ease-in-out;
     margin-bottom: 30px;
     max-width: 800px;
     width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    animation: fadeInUp 0.8s ease-in-out;
 }
+
 .login-form, .register-form {
     text-align: center;
-    padding: 40px 30px; /* 40px top/bottom, 30px left/right */
-    background-color: #a0d6ea;
+    padding: 40px 30px;
+    background-color: #F0F4FF; /* Soft blue */
     border-radius: 20px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease, transform 0.3s ease-in-out;
@@ -60,36 +82,50 @@ p {
     max-width: 400px;
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    animation: fadeInUp 0.8s ease-in-out;
 }
+
 .upload-form {
-    background: linear-gradient(135deg, #81e3d4, #F5F5F5);
+    background: linear-gradient(135deg, #A8D8EA, #F0F7FF); /* Light blue gradient */
 }
 
 .login-form:hover, .register-form:hover, .home-page:hover, .upload-form:hover, .container:hover {
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.15), 0 0 20px rgba(106, 76, 147, 0.2); /* Glowing effect */
     transform: translateY(-4px);
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Input Fields */
 input[type="text"], input[type="password"], input[type="file"] {
-    width: 100%; /* Full width */
-    padding: 12px 16px; /* Comfortable padding */
-    margin: 10px 0; /* Margin for spacing */
-    border: 2px solid #3F51B5; /* Border color */
-    border-radius: 12px; /* Rounded corners */
-    background-color: #F9F9F9; /* Light background */
-    font-size: 16px; /* Readable font size */
-    color: #444444; /* Text color */
-    transition: all 0.3s ease; /* Smooth transitions */
-    box-sizing: border-box; /* Include padding in width */
-    outline: none; /* Remove default focus outline */
+    width: 100%;
+    padding: 12px 16px;
+    margin: 10px 0;
+    border: 2px solid #6A4C93; /* Medium purple */
+    border-radius: 12px;
+    background-color: #F9F9F9;
+    font-size: 16px;
+    color: #3A3A3A;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    outline: none;
 }
 
 input[type="text"]:focus, input[type="password"]:focus, input[type="file"]:focus {
-    border-color: #7C4DFF;
-    background-color: #E3F2FD;
+    border-color: #8E6DBE; /* Light purple */
+    background-color: #F0F4FF;
     outline: none;
-    box-shadow: 0 0 10px rgba(124, 77, 255, 0.4);
+    box-shadow: 0 0 10px rgba(142, 109, 190, 0.4);
 }
 
 input::placeholder {
@@ -97,10 +133,10 @@ input::placeholder {
 }
 
 /* Buttons */
-button, .btn {
+button {
     width: 100%;
     padding: 15px;
-    background-color: #7C4DFF;
+    background-color: #6A4C93; /* Medium purple */
     color: #fff;
     border: none;
     border-radius: 12px;
@@ -112,25 +148,47 @@ button, .btn {
     text-decoration: none;
 }
 
-button:hover, .btn:hover {
-    background-color: #5E35B1;
+button:hover {
+    background-color: #4A2C6A; /* Deep purple */
     transform: scale(1.05);
 }
 
-button:focus, .btn:focus {
+button:focus {
     outline: none;
-
-}/* Container for buttons */
-.button-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Two columns */
-    gap: 20px; /* Space between buttons */
+}
+.btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #ca07ca; /* Medium purple */
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+    margin-top: 20px;
+    text-decoration: none;
 }
 
-/* Button style */
+.btn:hover {
+    background-color: #7f0181; /* Deep purple */
+    transform: scale(1.05);
+}
+
+.btn:focus {
+    outline: none;
+}
+
+.button-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
 .bttn {
     padding: 30px 20px;
-    background-color: #7C4DFF;
+    background-color: #6A4C93; /* Medium purple */
     color: #fff;
     border: none;
     border-radius: 16px;
@@ -144,7 +202,7 @@ button:focus, .btn:focus {
 }
 
 .bttn:hover {
-    background-color: #5E35B1;
+    background-color: #4A2C6A; /* Deep purple */
     transform: translateY(-4px);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
@@ -156,31 +214,33 @@ button:focus, .btn:focus {
 
 .button-containers {
     display: flex;
-    gap: 20px; /* Space between buttons */
-    flex-wrap: wrap; /* Allow wrapping to the next row */
-    justify-content: space-between; /* Distribute space evenly */
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
+
 .btton {
-    width: 100%; /* Full width */
-    padding: 30px 20px; /* Increased padding for a bigger size */
-    background-color: #7C4DFF; /* Primary color */
-    color: #fff; /* Text color */
-    border: none; /* Remove border */
-    border-radius: 16px; /* Slightly larger border radius */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 20px; /* Larger font size */
-    font-weight: 600; /* Bold text */
-    transition: background-color 0.3s ease, transform 0.2s ease-in-out, box-shadow 0.3s ease; /* Smooth transitions */
-    margin-top: 20px; /* Margin at the top */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Card-like shadow */
-    display: flex; /* Flexbox for centering content */
-    align-items: center; /* Vertically center content */
-    justify-content: center; /* Horizontally center content */
+    width: 100%;
+    padding: 30px 20px;
+    background-color: #6A4C93; /* Medium purple */
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease-in-out, box-shadow 0.3s ease;
+    margin-top: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     text-decoration: none;
 }
+
 .btton:hover {
-    background-color: #5E35B1;
+    background-color: #4A2C6A; /* Deep purple */
     transform: translateY(-4px);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
@@ -191,9 +251,9 @@ button:focus, .btn:focus {
 }
 
 .bttoon {
-    width: 100px;  /* Set a specific width */
-    padding: 10px 5px;  /* Keep the padding consistent */
-    background-color: #ff4d4d;
+    width: 100px;
+    padding: 10px 5px;
+    background-color: #5b0625; /* Coral pink */
     color: #fff;
     border: none;
     border-radius: 70px;
@@ -205,8 +265,9 @@ button:focus, .btn:focus {
     text-align: center;
     text-decoration: none;
 }
+
 .bttoon:hover {
-    background-color: #690101;
+    background-color: #33011c; /* Darker pink */
     transform: translateY(-4px);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
@@ -215,6 +276,7 @@ button:focus, .btn:focus {
     transform: translateY(0);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
+
 /* Radio Buttons */
 .radio-group {
     display: flex;
@@ -227,7 +289,7 @@ button:focus, .btn:focus {
     display: flex;
     align-items: center;
     padding: 12px 20px;
-    background-color: #f5f7fa;
+    background-color: #F5F7FA;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -235,14 +297,15 @@ button:focus, .btn:focus {
 }
 
 .radio-group label:hover {
-    background-color: #e8f0fe;
+    background-color: #E8F0FE;
     transform: translateY(-2px);
 }
 
 .radio-group input[type="radio"]:checked + label {
-    background-color: #2980b9;
+    background-color: #6A4C93; /* Medium purple */
     color: white;
 }
+
 /* Profile */
 .profile-info {
     background-color: white;
@@ -254,52 +317,47 @@ button:focus, .btn:focus {
 
 .profile-info p {
     font-size: 1.2em;
-    color: #444;
+    color: #3A3A3A;
     margin: 10px 0;
 }
 
 .profile-info strong {
-    color: #007BFF; /* Blue for labels */
+    color: #6A4C93; /* Medium purple */
 }
+
 /* Lists and Items */
 ul {
     list-style: none;
     padding: 0;
     margin: 20px 0;
-}
-/* Lists and Items */
-ul {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0;
-    text-align: left; /* Ensure list contents are left-aligned */
+    text-align: left;
 }
 
 li {
-    background-color: #dae6f1;
+    background-color: #E6F4F1; /* Soft green */
     margin: 12px 0;
     padding: 15px 20px;
     border-radius: 10px;
     transition: all 0.3s ease;
-    border-left: 4px solid #2980b9;
-    text-align: left; /* Left-align text inside list items */
+    border-left: 4px solid #6A4C93; /* Medium purple */
+    text-align: left;
 }
 
 li:hover {
     transform: translateX(5px);
-    background-color: #a1cbf9;
+    background-color: #D4EDE8; /* Lighter green */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 li a {
-    color: #4a4848;
+    color: #3A3A3A;
     text-decoration: none;
     display: block;
-    text-align: left; /* Left-align links inside list items */
+    text-align: left;
 }
 
 li a:hover {
-    color: #000000;
+    color: #4A2C6A; /* Deep purple */
 }
 
 /* Tables */
@@ -315,23 +373,25 @@ th, td {
     border: 1px solid #DDD;
     text-align: left;
     font-size: 16px;
-    color: #333;
+    color: #3A3A3A;
 }
 
 th {
-    background-color: #3F51B5;
+    background: linear-gradient(135deg, #403874, #432dd3); /* Purple gradient */
     color: #ffffff;
     font-weight: bold;
     text-transform: uppercase;
+    padding: 20px;
 }
 
 tr:nth-child(even) {
-    background-color: #F5F5F5;
+    background-color: #ccc9ff;
 }
 
 tr:hover {
-    background-color: #7C4DFF;
+    background-color: #110b4a; /* Light purple */
     color: #fff;
+    transition: all 0.3s ease;
 }
 
 tr:hover td {
@@ -353,27 +413,21 @@ tr:hover td {
 }
 
 .messages p.success {
-    background-color: #4CAF50;
+    background-color: #4CAF50; /* Green */
     color: #fff;
 }
 
 .messages p.error {
-    background-color: #FF5252;
+    background-color: #FF6B6B; /* Coral pink */
     color: #fff;
 }
 
-/* Animations */
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
-.recommendations {
-    animation: fadeIn 0.5s ease-in-out;
+.response-box {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #E6F4F1; /* Soft green */
+    border-radius: 8px;
+    white-space: pre-wrap;
 }
 
 /* Responsive Design */
@@ -382,16 +436,24 @@ tr:hover td {
         padding: 20px;
     }
 
-    h2, h3 {
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
         font-size: 1.8rem;
     }
 
-    th, td {
-        font-size: 14px;
+    h3 {
+        font-size: 1.6rem;
     }
 
-    button, .btn {
+    button, .btn, .bttn, .btton, .bttoon {
         padding: 12px;
         font-size: 16px;
+    }
+
+    .button-container {
+        grid-template-columns: 1fr;
     }
 }
