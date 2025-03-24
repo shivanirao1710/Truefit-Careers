@@ -385,14 +385,19 @@ def chatbot_route():
         return render_template("chatbot.html", user_input=user_input, response=response)
 
     return render_template("chatbot.html", user_input="", response="Ask me about job roles, skills, or anything else!")
-
 def get_resume_data(user_id):
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
 
-        # Query to get the resume details using the user_id
-        query = "SELECT resume_id, name, email, skills, education, insights FROM resumes WHERE user_id = %s"
+        # Query to get the most recent resume details using the user_id
+        query = """
+            SELECT resume_id, name, email, skills, education, insights 
+            FROM resumes 
+            WHERE user_id = %s 
+            ORDER BY resume_id DESC 
+            LIMIT 1
+        """
         cursor.execute(query, (user_id,))
         result = cursor.fetchone()
 
@@ -416,7 +421,7 @@ def get_resume_data(user_id):
     except Exception as e:
         print("Error fetching data: ", e)
         return None
-
+    
 # Route to display the profile page
 @app.route('/profile')
 def profile():
@@ -431,7 +436,7 @@ def profile():
         return render_template('profile.html', data=resume_data)
     else:
         return "Profile not found!", 404
-
+    
 # Home Route for search functionality
 @app.route("/search", methods=["GET", "POST"])
 def search():
@@ -520,6 +525,7 @@ def register():
         return redirect(url_for('home'))
     
     return render_template('register.html')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -550,12 +556,12 @@ def upload():
     if request.method == 'POST':
         if "resume" not in request.files:
             flash("No file uploaded!")
-            return redirect("/upload")
+            return redirect(url_for('upload'))
         
         file = request.files["resume"]
         if file.filename == "":
             flash("No file selected!")
-            return redirect("/upload")
+            return redirect(url_for('upload'))
 
         # Extract text based on file type
         if file.filename.endswith(".pdf"):
@@ -564,7 +570,7 @@ def upload():
             text = extract_text_from_docx(file)
         else:
             flash("Unsupported file format! Please upload a PDF or DOCX file.")
-            return redirect("/upload")
+            return redirect(url_for('upload'))
 
         # Parse resume text
         parsed_data = parse_resume(text)
@@ -573,6 +579,14 @@ def upload():
         try:
             conn = get_db_connection()
             cur = conn.cursor()
+
+            # Delete existing resumes for the user
+            cur.execute(
+                "DELETE FROM resumes WHERE user_id = %s",
+                (session['user_id'],)
+            )
+
+            # Insert the new resume
             cur.execute(
                 """
                 INSERT INTO resumes (user_id, name, email, phone, skills, experience, education, projects, file_name, insights) 
@@ -587,15 +601,14 @@ def upload():
             conn.close()
 
             flash("Resume uploaded and parsed successfully!")
-            return redirect("/display")
+            return redirect(url_for('display'))
 
         except Exception as e:
             print("Error inserting into database:", e)
             flash("Error uploading resume. Please try again.")
-            return redirect("/upload")
+            return redirect(url_for('upload'))
     
     return render_template("upload.html")
-
 # Display resume data
 @app.route("/display", methods=["GET"])
 def display():
@@ -618,8 +631,8 @@ def display():
         return render_template("display.html", resume=resume_data)
     else:
         flash("No resume data found!")
-        return redirect("/upload")
-
+        return redirect(url_for('upload'))
+    
 # Get job recommendations
 @app.route("/get_jobs", methods=["GET"])
 def get_jobs():
@@ -688,7 +701,6 @@ def get_jobs():
     except Exception as e:
         print("Error fetching job recommendations:", e)
         return jsonify({"jobs": []})
-
     
 # Logout route
 @app.route('/logout')
