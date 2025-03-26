@@ -37,7 +37,7 @@ def get_db_connection():
     )
     return connection
 
-# Extract text from PDF
+# Extract text from PDF #RESUME
 def extract_text_from_pdf(file):
     reader = PyPDF2.PdfReader(file)
     text = ""
@@ -45,7 +45,7 @@ def extract_text_from_pdf(file):
         text += page.extract_text()
     return text
 
-# Extract text from Word document
+# Extract text from Word document #RESUME
 def extract_text_from_docx(file):
     doc = docx.Document(file)
     text = ""
@@ -54,11 +54,11 @@ def extract_text_from_docx(file):
     return text
 
 # Generate insights using LLM
-def generate_insights(text):
+def generate_insights(text): #RESUME
     summary = summarizer(text, max_length=100, min_length=30, do_sample=False)
     return summary[0]["summary_text"]
 
-# Extract specific sections
+# Extract specific sections  #RESUME
 def extract_section(text, keywords):
     for keyword in keywords:
         if keyword.lower() in text.lower():
@@ -67,8 +67,8 @@ def extract_section(text, keywords):
             return text[start_index:end_index].strip()
     return ""
 
-# Find the next section header
-def find_next_section(text, start_index):
+# Find the next section header #RESUME
+def find_next_section(text, start_index): 
     section_headers = ["experience", "education", "projects", "skills", "certifications", "achievements"]
     next_index = len(text)
     for header in section_headers:
@@ -100,18 +100,18 @@ skill_variations = {
     "python2": "python",
     # Add more variations as needed
 }
-
-def normalize_skill(skill):
+#RESUME
+def normalize_skill(skill): 
     """Normalize a skill to its canonical form."""
     return skill_variations.get(skill.lower(), skill.lower())
-
+#RESUME
 def normalize_text(text):
     """Normalize skill variations in the resume text."""
     for variation, canonical in skill_variations.items():
         text = re.sub(rf"\b{re.escape(variation)}\b", canonical, text, flags=re.IGNORECASE)
     return text
 
-# Parse resume text
+# Parse resume text #RESUME
 def parse_resume(text):
     data = {
         "name": "",
@@ -199,7 +199,7 @@ def parse_resume(text):
     data["insights"] = generate_insights(text)
 
     return data
-
+#JOB RECOMMENDATION
 def get_job_data_from_postgresql():
     """Fetch job data from PostgreSQL database"""
     try:
@@ -214,7 +214,7 @@ def get_job_data_from_postgresql():
         print(f"Error: {err}")
         return []
 
-
+#JOB RECOMMENDATION
 def prepare_faiss_index(job_data):
     """Prepare FAISS index for semantic search"""
     job_embeddings = []
@@ -233,7 +233,7 @@ def prepare_faiss_index(job_data):
     faiss_index.add(job_embeddings)
     return faiss_index, job_titles
 
-
+#JOB RECOMMENDATION
 def find_job_roles_by_skills(skills, top_n=5):
     """Find job roles based on skills"""
     skills_query = skills.lower().split(",")  # Split skills by comma and strip
@@ -254,7 +254,7 @@ def find_job_roles_by_skills(skills, top_n=5):
             recommended_jobs.append(job)
     return recommended_jobs
 
-
+#JOB RECOMMENDATION
 def find_job_roles_by_job_role(job_role, top_n=5):
     """Find job roles by job role name"""
     job_role = job_role.lower().strip()
@@ -272,7 +272,7 @@ def find_job_roles_by_job_role(job_role, top_n=5):
             recommended_jobs.append(job)
     return recommended_jobs
 
-
+#JOB RECOMMENDATION
 def find_job_roles_by_company(company_name, top_n=5):
     """Find job roles based on company name"""
     company_name = company_name.lower().strip()
@@ -283,7 +283,7 @@ def find_job_roles_by_company(company_name, top_n=5):
     
     return filtered_jobs
 
-
+#JOB RECOMMENDATION
 def correct_grammar_and_generate_response(text):
     """Generate a well-formed response using GPT-2 for grammar correction"""
     inputs = gpt_tokenizer.encode(text, return_tensors='pt')
@@ -301,7 +301,7 @@ def correct_grammar_and_generate_response(text):
     response = gpt_tokenizer.decode(outputs[0], skip_special_tokens=True)
     return response
 
-
+#CHATBOT
 def extract_job_role_from_input(user_input):
     """Extract job role from the user's input."""
     # Remove unnecessary words to isolate the role
@@ -310,7 +310,7 @@ def extract_job_role_from_input(user_input):
         if keyword in user_input.lower():
             return user_input.lower().replace(keyword, "").strip()
     return user_input.strip()
-
+#CHATBOT
 def extract_skills_from_input(user_input):
     """Extract skills from the user's input."""
     keywords = ["skills needed for", "skills required for", "technologies for", "tools for"]
@@ -319,7 +319,7 @@ def extract_skills_from_input(user_input):
             return user_input.lower().replace(keyword, "").strip()
     return user_input.strip()
 
-
+#CHATBOT
 def find_job_roles_by_skill(skills_query):
     job_info = get_job_data_from_postgresql()
     recommended_jobs = []
@@ -337,6 +337,7 @@ def find_job_roles_by_skill(skills_query):
             recommended_jobs.append(job)
 
     return recommended_jobs
+#CHATBOT
 @app.route("/chatbot", methods=["GET", "POST"])
 def chatbot_route():
     if request.method == "POST":
@@ -385,6 +386,7 @@ def chatbot_route():
         return render_template("chatbot.html", user_input=user_input, response=response)
 
     return render_template("chatbot.html", user_input="", response="Ask me about job roles, skills, or anything else!")
+#RESUME
 def get_resume_data(user_id):
     try:
         connection = get_db_connection()
@@ -423,6 +425,7 @@ def get_resume_data(user_id):
         return None
     
 # Route to display the profile page
+#PROFILE
 @app.route('/profile')
 def profile():
     # Check if user_id exists in session
@@ -438,6 +441,7 @@ def profile():
         return "Profile not found!", 404
     
 # Home Route for search functionality
+#JOB RECOMMENDATION
 @app.route("/search", methods=["GET", "POST"])
 def search():
     recommendations = []
@@ -468,6 +472,7 @@ def search():
 
 
 # Job Details Route (for viewing specific job details)
+#JOB RECOMMENDATION
 @app.route("/job/<job_role>/<company_name>")
 def job_details(job_role, company_name):
     job_data = get_job_data_from_postgresql()
@@ -548,6 +553,7 @@ def login():
     return render_template('login.html')
 
 # Upload and parse resume
+#RESUME
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     if 'user_id' not in session:
@@ -609,7 +615,9 @@ def upload():
             return redirect(url_for('upload'))
     
     return render_template("upload.html")
+
 # Display resume data
+#RESUME
 @app.route("/display", methods=["GET"])
 def display():
     if 'user_id' not in session:
@@ -634,6 +642,7 @@ def display():
         return redirect(url_for('upload'))
     
 # Get job recommendations
+#RESUME
 @app.route("/get_jobs", methods=["GET"])
 def get_jobs():
     if 'user_id' not in session:
