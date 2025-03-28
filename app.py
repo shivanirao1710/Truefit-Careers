@@ -669,7 +669,7 @@ def get_jobs():
             if skills_field:  # Check if the field is not None
                 combined_skills.update([skill.strip().lower() for skill in skills_field.split(",")])
 
-        print("Resume Skills:", combined_skills)
+        
 
         # Fetch all jobs from the job_roles table
         cur.execute("SELECT job_role, company_name, company_type, skills FROM job_roles")
@@ -704,7 +704,7 @@ def get_jobs():
         # Rank jobs by relevance score (highest first)
         ranked_jobs = sorted(recommended_jobs, key=lambda x: x["relevance_score"], reverse=True)[:5]
 
-        print("Recommended Jobs:", ranked_jobs)
+
         return jsonify({"jobs": ranked_jobs})
 
     except Exception as e:
