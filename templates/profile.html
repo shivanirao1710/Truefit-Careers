@@ -5,12 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <title>User Profile</title>
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='images/image3.png') }}");
+            background-size: cover;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9); /* Changed from 0.5 to 0.3 (more visible) */
+            z-index: -1;
+        }
+    </style>
 </head>
 <body>
 
     <div class="container">
         <!-- Profile Info Section -->
         <div class="profile-info">
+            <h2>My Profile</h2>
             <p><strong>Name:</strong> {{ data.name }}</p>
             <p><strong>Email:</strong> {{ data.email }}</p>
             <p><strong>Skills:</strong> {% for skill in data.skills.split(',') %}{{ skill }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
@@ -18,10 +36,8 @@
             <p><strong>Insights:</strong> {{ data.insights }}</p>
             <p><strong>Behavior Tag:</strong></p>
         </div>
-
-        <!-- Back to Home Button -->
-        <a href="{{ url_for('home') }}" class="btn">Back to Home</a>
     </div>
+    <a href="{{ url_for('home') }}" class="btn">Back to Home</a>
 
 </body>
 </html>

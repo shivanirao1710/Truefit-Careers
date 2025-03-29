@@ -5,6 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <title>Job Details</title>
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='images/image6.png') }}");
+            background-size: cover;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.5); /* Changed from 0.5 to 0.3 (more visible) */
+            z-index: -1;
+        }
+    
+        .upload-form {  
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 15px 25px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(106, 76, 147, 0.1);
+            margin: 15px auto;
+            max-width: 80%;
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <div class="upload-form">

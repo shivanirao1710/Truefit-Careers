@@ -5,6 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <title>Chatbot</title>
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='images/image7.png') }}");
+            background-size: cover;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.4); /* Changed from 0.5 to 0.3 (more visible) */
+            z-index: -1;
+        }
+        h1 {
+            color: #4A2C6A; /* Deep purple text */
+            background-color: rgba(255, 255, 255, 0.9); /* 90% opaque white */
+            display: inline-block; /* Box wraps content */
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(106, 76, 147, 0.15);
+            margin: 20px auto; /* Centering */
+            text-align: center;
+            border: 1px solid rgba(106, 76, 147, 0.1); /* Subtle border */
+            background: 
+      linear-gradient(white, white) padding-box,
+      linear-gradient(135deg, #201334, #452c67) border-box;
+    border: 3px solid transparent;
+    border-radius: 12px;
+        }
+        .upload-form {  
+            text-align: center;
+        }
+        
+        .message-box {
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border-left: 4px solid #33214d;
+            box-shadow: 0 2px 8px rgba(106, 76, 147, 0.1);
+            margin: 15px auto;
+            max-width: 80%;
+            text-align: left;
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <div class="upload-form">
@@ -16,11 +64,15 @@
         </form>
 
         {% if user_input %}
-            <p><strong>You:</strong> {{ user_input }}</p>
-            <p class="response-box"><strong>Bot:</strong> {{ response }}</p>
+            <div class="message-box">
+                <strong>You:</strong> {{ user_input }}
+            </div>
+            <div class="message-box">
+                <strong>Bot:</strong> {{ response }}
+            </div>
         {% endif %}
         <br>
-        <a href="{{ url_for('home') }}" class="btn">Back to Home</a>
     </div>
+    <a href="{{ url_for('home') }}" class="btn">Back to Home</a>
 </body>
 </html>

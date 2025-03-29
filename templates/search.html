@@ -5,11 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <title>Job Role Recommendation System</title>
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='images/image6.png') }}");
+            background-size: cover;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.4); /* Changed from 0.5 to 0.3 (more visible) */
+            z-index: -1;
+        }
+        h1 {
+            color: #4A2C6A; /* Deep purple text */
+            background-color: rgba(255, 255, 255, 0.9); /* 90% opaque white */
+            display: inline-block; /* Box wraps content */
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(106, 76, 147, 0.15);
+            margin: 20px auto; /* Centering */
+            text-align: center;
+            border: 1px solid rgba(106, 76, 147, 0.1); /* Subtle border */
+            background: 
+      linear-gradient(white, white) padding-box,
+      linear-gradient(135deg, #201334, #452c67) border-box;
+    border: 3px solid transparent;
+    border-radius: 12px;
+        }
+        .upload-form {  
+            text-align: center;
+        }
+        .search-form
+        {
+            text-align: center;
+            background-color: rgba(231, 225, 233, 0.60);
+            padding: 15px 25px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(106, 76, 147, 0.1);
+            margin: 15px auto;
+            max-width: 80%;
+            display: block; 
+        }
+    </style>
+
 </head>
 <body>
     <div class="upload-form">
-        <h1>Job Role Recommendation System</h1>
-        
+        <h1>Job Role Recommendation</h1>
+        <div class="search-form">
         <!-- Form to search by either skills or job role -->
         <form method="POST">
             <div class="radio-group">
@@ -54,13 +102,13 @@
                 <p>No recommendations found for the entered job role. Try modifying the input or using different job titles.</p>
             {% endif %}
         {% endif %}
-        <br>
-        <a href="{{ url_for('reset') }}" class="btn">Reset Search</a><br><br>
+        <a href="{{ url_for('reset') }}" class="bton">Reset Search</a><br><br>
 
         <!-- Chatbot Button -->
-        <div style="margin-top: 20px;">
-            <a href="{{ url_for('home') }}" class="btn">Back to Home</a>
-        </div>
+    </div>  
+    </div>
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('home') }}" class="btn">Back to Home</a>
     </div>
 </body>
 </html>
