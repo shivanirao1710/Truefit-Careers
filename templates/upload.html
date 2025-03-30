@@ -45,15 +45,7 @@
 <body>
     <div class="upload-form">
         <h1>Upload Your Resume</h1>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <div class="messages">
-                    {% for message in messages %}
-                        <p>{{ message }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
+        
         <form action="/upload" method="post" enctype="multipart/form-data">
             <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
             <button type="submit">Upload</button>

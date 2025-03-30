@@ -525,11 +525,12 @@ def register():
         
         cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
         conn.commit()
-        flash("Registration successful! You can log in now.")
+        flash("Registration successful!Log in")
         conn.close()
-        return redirect(url_for('home'))
+        return redirect(url_for('login'))  
     
     return render_template('register.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

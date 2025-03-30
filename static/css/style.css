@@ -253,7 +253,7 @@
     padding: 25px 15px;
     background-color: #2e1353;
     color: #fff;
-    border: none;
+    border: 4px solid white; /* Added white border */
     border-radius: 16px;
     cursor: pointer;
     font-size: 22px;
@@ -267,7 +267,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
+}
   
   /* Bottom Button (.btton) - Full width below */
   .button-containers {
@@ -282,7 +282,7 @@
     padding: 25px 15px;
     background-color: #2a114c;
     color: #fff;
-    border: none;
+    border: 4px solid white; /* Added white border */
     border-radius: 16px;
     cursor: pointer;
     font-size: 20px;
@@ -296,7 +296,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
+}
   
   /* Hover Effects */
   .bttn:hover, .btton:hover {
@@ -338,7 +338,12 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     text-align: center;
     text-decoration: none;
-    
+  }
+
+  .bttoon:hover {
+    background-color: #171717;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
   }
   /* Extra Narrow Form Inputs */
 input[type="text"], 
