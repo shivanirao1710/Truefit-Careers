@@ -199,7 +199,7 @@ def parse_resume(text):
     data["insights"] = generate_insights(text)
 
     return data
-#JOB RECOMMENDATION
+#JOB RECOMMENDATION #CHATBOT
 def get_job_data_from_postgresql():
     """Fetch job data from PostgreSQL database"""
     try:
@@ -317,7 +317,10 @@ def extract_skills_from_input(user_input):
     for keyword in keywords:
         if keyword in user_input.lower():
             return user_input.lower().replace(keyword, "").strip()
-    return user_input.strip()
+    return user_input.strip()#CHATBOT
+def find_job_roles_by_skill(skills_query):
+    job_info = get_job_data_from_postgresql()
+    recommended_jobs = []
 
 #CHATBOT
 def find_job_roles_by_skill(skills_query):
@@ -337,55 +340,70 @@ def find_job_roles_by_skill(skills_query):
             recommended_jobs.append(job)
 
     return recommended_jobs
+
 #CHATBOT
+
 @app.route("/chatbot", methods=["GET", "POST"])
 def chatbot_route():
     if request.method == "POST":
         user_input = request.form.get("user_input", "").strip()
 
         if not user_input:
-            return render_template("chatbot.html", user_input=user_input, response="Please ask me something!")
+            return render_template("chatbot.html", response="Please ask me something!")
 
-        job_info = get_job_data_from_postgresql()
+        job_info = get_job_data_from_postgresql()  # Fetch job data
         response = ""
 
-        # Check if the user is asking about job roles
-        if any(keyword in user_input.lower() for keyword in ["job", "role", "position", "career", "skills needed for"]):
-            job_role = extract_job_role_from_input(user_input)
-            matching_jobs = [job for job in job_info if job_role.lower() in job['job_role'].lower()]
+        # ✅ Check if user is asking about "skills needed for X"
+        match = re.search(r"(?:skills needed for|skills for|technology required for)\s+(.+)", user_input, re.IGNORECASE)
+        if match:
+            job_role = match.group(1).strip()
+            matching_jobs = [job for job in job_info if job_role.lower() in job["job_role"].lower()]
 
             if matching_jobs:
-                response = f"Here are some roles related to '{job_role}':\n"
-                for job in matching_jobs[:3]:  # Limit to 3 results
-                    response += (
-                        f"- {job['job_role']} at {job['company_name']} "
-                        f"(Skills Needed: {job['skills_cleaned']})\n"
-                    )
+                response = f"Here are the key skills needed for **{job_role}**:\n\n"
+                response += "\n".join(
+                    f"- **{job['job_role']}** at {job['company_name']} (Skills: {job['skills_cleaned']})"
+                    for job in matching_jobs[:3]
+                )
             else:
-                response = f"Sorry, I couldn't find any roles related to '{job_role}'."
-        # Check if the user is asking about skills
-        elif any(keyword in user_input.lower() for keyword in ["skills", "technology","skill", "tools"]):
-            skills_query = extract_skills_from_input(user_input)
-            recommended_jobs = find_job_roles_by_skill(skills_query)
+                response = f"Sorry, I couldn't find skills for **'{job_role}'**. Try a different job title."
 
-            if recommended_jobs:
-                response = "I found some jobs related to the skills you're looking for:\n"
-                for job in recommended_jobs[:3]:  # Limit to 3 jobs for brevity
-                    response += (
-                        f"- {job['job_role']} at {job['company_name']} "
-                        f"(Skills Needed: {job['skills_cleaned']})\n"
-                    )
+        # ✅ Check if user is asking about "job roles for X"
+        elif re.search(r"(?:job roles for|roles for|positions for|careers in)\s+(.+)", user_input, re.IGNORECASE):
+            job_role = re.search(r"(?:job roles for|roles for|positions for|careers in)\s+(.+)", user_input, re.IGNORECASE).group(1).strip()
+            matching_jobs = [job for job in job_info if job_role.lower() in job["job_role"].lower()]
+
+            if matching_jobs:
+                response = f"Here are some job roles related to **{job_role}**:\n\n"
+                response += "\n".join(
+                    f"- **{job['job_role']}** at {job['company_name']} (Skills: {job['skills_cleaned']})"
+                    for job in matching_jobs[:3]
+                )
             else:
-                response = f"I couldn't find any jobs with the skills '{skills_query}'. Try different skills."
-        
-# General conversation: Use the chatbot for free-form conversations
+                response = f"Sorry, I couldn't find roles for **'{job_role}'**. Try a different job title."
+
+        # ✅ Check if user is asking about "jobs at X"
+        elif re.search(r"jobs at\s+(.+)", user_input, re.IGNORECASE):
+            company_name = re.search(r"jobs at\s+(.+)", user_input, re.IGNORECASE).group(1).strip()
+            matching_jobs = [job for job in job_info if company_name.lower() in job["company_name"].lower()]
+
+            if matching_jobs:
+                response = f"Here are some job roles available at **{company_name}**:\n\n"
+                response += "\n".join(
+                    f"- **{job['job_role']}** (Skills: {job['skills_cleaned']})"
+                    for job in matching_jobs[:3]
+                )
+            else:
+                response = f"Sorry, I couldn't find any jobs at **{company_name}**. Try checking the company's career page."
+
         else:
-            response = chatbot(user_input, max_length=50, num_return_sequences=1)[0]['generated_text']
-            response = correct_grammar_and_generate_response(response)
+            response = "I'm not sure how to respond to that. Try asking about job roles, skills, or specific companies."
 
         return render_template("chatbot.html", user_input=user_input, response=response)
 
-    return render_template("chatbot.html", user_input="", response="Ask me about job roles, skills, or anything else!")
+    return render_template("chatbot.html", response="Ask me about job roles, skills, or anything else!")
+
 #RESUME
 def get_resume_data(user_id):
     try:
