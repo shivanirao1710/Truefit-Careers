@@ -283,64 +283,24 @@ def find_job_roles_by_company(company_name, top_n=5):
     
     return filtered_jobs
 
-#JOB RECOMMENDATION
+#CHATBOT
 def correct_grammar_and_generate_response(text):
-    """Generate a well-formed response using GPT-2 for grammar correction"""
+    """Generate a well-formed response using GPT-2 for grammar correction and short replies"""
     inputs = gpt_tokenizer.encode(text, return_tensors='pt')
-    
-    # Use max_new_tokens to handle long input
+
     outputs = gpt_model.generate(
         inputs,
-        max_new_tokens=150,  # Limit the generation to 150 new tokens
+        max_new_tokens=30,  # Limit response length to prevent rambling
         num_return_sequences=1,
         no_repeat_ngram_size=2,
-        top_p=0.92,
-        temperature=0.7
+        top_p=0.85,  # Reduce randomness
+        temperature=0.6
     )
-    
-    response = gpt_tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return response
 
-#CHATBOT
-def extract_job_role_from_input(user_input):
-    """Extract job role from the user's input."""
-    # Remove unnecessary words to isolate the role
-    keywords = ["tell me about", "what is", "role of", "job of", "job role for", "describe", "give me information about", "skills needed for"]
-    for keyword in keywords:
-        if keyword in user_input.lower():
-            return user_input.lower().replace(keyword, "").strip()
-    return user_input.strip()
-#CHATBOT
-def extract_skills_from_input(user_input):
-    """Extract skills from the user's input."""
-    keywords = ["skills needed for", "skills required for", "technologies for", "tools for"]
-    for keyword in keywords:
-        if keyword in user_input.lower():
-            return user_input.lower().replace(keyword, "").strip()
-    return user_input.strip()#CHATBOT
-def find_job_roles_by_skill(skills_query):
-    job_info = get_job_data_from_postgresql()
-    recommended_jobs = []
+    generated_response = gpt_tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-#CHATBOT
-def find_job_roles_by_skill(skills_query):
-    job_info = get_job_data_from_postgresql()
-    recommended_jobs = []
-
-    for job in job_info:
-        # Convert job skills to a set of lowercased words
-        job_skills = set(job['skills_cleaned'].lower().split(", "))
-        query_skills = set(skills_query.lower().split(", "))
-        
-        # Check for intersection between job skills and query skills
-        matching_skills = job_skills.intersection(query_skills)
-        
-        # If there are matching skills, add the job to the recommended list
-        if matching_skills:
-            recommended_jobs.append(job)
-
-    return recommended_jobs
-
+    # Trim response to keep it short and clear
+    return generated_response.split(".")[0] + "." 
 #CHATBOT
 
 @app.route("/chatbot", methods=["GET", "POST"])
@@ -397,8 +357,9 @@ def chatbot_route():
             else:
                 response = f"Sorry, I couldn't find any jobs at **{company_name}**. Try checking the company's career page."
 
+          # ✅ Handle General Queries with Controlled GPT-2 Response
         else:
-            response = "I'm not sure how to respond to that. Try asking about job roles, skills, or specific companies."
+            response = correct_grammar_and_generate_response(user_input)
 
         return render_template("chatbot.html", user_input=user_input, response=response)
 
