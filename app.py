@@ -284,32 +284,56 @@ def find_job_roles_by_company(company_name, top_n=5):
     return filtered_jobs
 
 #CHATBOT
+def get_user_name():
+    user_id = session.get("user_id")  # Get logged-in user_id
+
+    if not user_id:
+        return "there"  # Default fallback if no user is logged in
+
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT name FROM resumes WHERE user_id = %s LIMIT 1;", (user_id,))
+            result = cursor.fetchone()
+            return result[0] if result else "there"  # Return name or fallback
+    except Exception as e:
+        print("Error fetching name:", e)
+        return "there"
+    finally:
+        conn.close()
+
+#CHATBOT
 def correct_grammar_and_generate_response(text):
-    """Generate a well-formed response using GPT-2 for grammar correction and short replies"""
+    """Fix grammar using GPT-2 and generate short, meaningful responses."""
     inputs = gpt_tokenizer.encode(text, return_tensors='pt')
 
     outputs = gpt_model.generate(
         inputs,
-        max_new_tokens=30,  # Limit response length to prevent rambling
+        max_new_tokens=30,  # Limit response length
         num_return_sequences=1,
         no_repeat_ngram_size=2,
-        top_p=0.85,  # Reduce randomness
+        top_p=0.85,
         temperature=0.6
     )
 
     generated_response = gpt_tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-    # Trim response to keep it short and clear
-    return generated_response.split(".")[0] + "." 
-#CHATBOT
+    # ✅ Extract the first proper sentence to avoid unnecessary text
+    cleaned_response = re.split(r'[.!?]', generated_response)[0].strip() + "."
 
+    return cleaned_response
+#CHATBOT
+# ✅ Chatbot Route
 @app.route("/chatbot", methods=["GET", "POST"])
 def chatbot_route():
+    user_name = get_user_name()  # Fetch user name at the beginning
+    greeting_message = f"Hello {user_name}! Ask me about job roles, skills, or anything else."
+    
     if request.method == "POST":
         user_input = request.form.get("user_input", "").strip()
 
         if not user_input:
-            return render_template("chatbot.html", response="Please ask me something!")
+            return render_template("chatbot.html", response=f"Hello {user_name}, please ask me something!")
 
         job_info = get_job_data_from_postgresql()  # Fetch job data
         response = ""
@@ -321,13 +345,13 @@ def chatbot_route():
             matching_jobs = [job for job in job_info if job_role.lower() in job["job_role"].lower()]
 
             if matching_jobs:
-                response = f"Here are the key skills needed for **{job_role}**:\n\n"
+                response = f"Here are the key skills needed for **{job_role}**, {user_name}:\n\n"
                 response += "\n".join(
                     f"- **{job['job_role']}** at {job['company_name']} (Skills: {job['skills_cleaned']})"
                     for job in matching_jobs[:3]
                 )
             else:
-                response = f"Sorry, I couldn't find skills for **'{job_role}'**. Try a different job title."
+                response = f"Sorry, {user_name}, I couldn't find skills for **'{job_role}'**. Try a different job title."
 
         # ✅ Check if user is asking about "job roles for X"
         elif re.search(r"(?:job roles for|roles for|positions for|careers in)\s+(.+)", user_input, re.IGNORECASE):
@@ -335,13 +359,13 @@ def chatbot_route():
             matching_jobs = [job for job in job_info if job_role.lower() in job["job_role"].lower()]
 
             if matching_jobs:
-                response = f"Here are some job roles related to **{job_role}**:\n\n"
+                response = f"Here are some job roles related to **{job_role}**, {user_name}:\n\n"
                 response += "\n".join(
                     f"- **{job['job_role']}** at {job['company_name']} (Skills: {job['skills_cleaned']})"
                     for job in matching_jobs[:3]
                 )
             else:
-                response = f"Sorry, I couldn't find roles for **'{job_role}'**. Try a different job title."
+                response = f"Sorry, {user_name}, I couldn't find roles for **'{job_role}'**. Try a different job title."
 
         # ✅ Check if user is asking about "jobs at X"
         elif re.search(r"jobs at\s+(.+)", user_input, re.IGNORECASE):
@@ -349,21 +373,27 @@ def chatbot_route():
             matching_jobs = [job for job in job_info if company_name.lower() in job["company_name"].lower()]
 
             if matching_jobs:
-                response = f"Here are some job roles available at **{company_name}**:\n\n"
+                response = f"Here are some job roles available at **{company_name}**, {user_name}:\n\n"
                 response += "\n".join(
                     f"- **{job['job_role']}** (Skills: {job['skills_cleaned']})"
                     for job in matching_jobs[:3]
                 )
             else:
-                response = f"Sorry, I couldn't find any jobs at **{company_name}**. Try checking the company's career page."
+                response = f"Sorry, {user_name}, I couldn't find any jobs at **{company_name}**. Try checking the company's career page."
 
-          # ✅ Handle General Queries with Controlled GPT-2 Response
+        # ✅ Handle General Queries with GPT-2 and DialoGPT
         else:
-            response = correct_grammar_and_generate_response(user_input)
+            corrected_input = correct_grammar_and_generate_response(user_input)  # Fix grammar first
+            
+            # ✅ Generate a conversational response using DialoGPT
+            bot_response = chatbot(corrected_input, max_new_tokens=50, pad_token_id=gpt_tokenizer.eos_token_id)[0]['generated_text']
+            
+            # ✅ Extract the relevant response (removing repetitions)
+            response = re.split(r'[\n]', bot_response)[0].strip()
 
-        return render_template("chatbot.html", user_input=user_input, response=response)
+        return render_template("chatbot.html", user_input=user_input, response=response, user_name=user_name)
 
-    return render_template("chatbot.html", response="Ask me about job roles, skills, or anything else!")
+    return render_template("chatbot.html", response=greeting_message, user_name=user_name)
 
 #RESUME
 def get_resume_data(user_id):
@@ -477,12 +507,13 @@ def reset():
 def index():
     return redirect(url_for('login'))
 
-# Home route
 @app.route('/home')
 def home():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template('home.html')
+    user_name = get_user_name()  # Fetch user's name from DB
+
+    return render_template('home.html', user_name=user_name)
 
 # Register route
 @app.route('/register', methods=['GET', 'POST'])
