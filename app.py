@@ -447,7 +447,7 @@ def profile():
     if resume_data:
         return render_template('profile.html', data=resume_data)
     else:
-        return "Profile not found!", 404
+        return "To update your profile, please upload your resume ", 404
     
 # Home Route for search functionality
 #JOB RECOMMENDATION
