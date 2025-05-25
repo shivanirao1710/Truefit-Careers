@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Test Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        /* Reset & Base Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    background-image: url("{{ url_for('static', filename='images/image4.png') }}");
+    background-size: cover;
+    position: relative;
+}
+body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.5); /* Changed from 0.5 to 0.3 (more visible) */
+            z-index: -1;
+        }
+
+h1 {
+            color: #4A2C6A; /* Deep purple text */
+            background-color: rgba(255, 255, 255, 0.9); /* 90% opaque white */
+            display: inline-block; /* Box wraps content */
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(106, 76, 147, 0.15);
+            margin: 20px auto; /* Centering */
+            text-align: center;
+            border: 1px solid rgba(106, 76, 147, 0.1); /* Subtle border */
+            background: 
+      linear-gradient(white, white) padding-box,
+      linear-gradient(135deg, #201334, #452c67) border-box;
+    border: 3px solid transparent;
+    border-radius: 12px;
+        }
+        .upload-form {  
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-form">
+        <h1>Personality Test Results</h1>
+        
+        <div id="result">
+            
+            <!-- Display behavioral tag -->
+            <p><strong>Behavioral Tag:</strong> {{ behavioral_tag }}</p>
+            <!-- Display results as percentages -->
+             <div>
+            <ul>
+                <li><strong>Openness:</strong> {{ (scores['openness'] * 100) | round(2) }}%</li>
+                <li><strong>Conscientiousness:</strong> {{ (scores['conscientiousness'] * 100) | round(2) }}%</li>
+                <li><strong>Extraversion:</strong> {{ (scores['extraversion'] * 100) | round(2) }}%</li>
+                <li><strong>Agreeableness:</strong> {{ (scores['agreeableness'] * 100) | round(2) }}%</li>
+                <li><strong>Neuroticism:</strong> {{ (scores['neuroticism'] * 100) | round(2) }}%</li>
+            </ul>
+ 
+            
+
+            <!-- Plotly Pie Chart -->
+            <div id="piechart"></div>
+        </div>
+        <br>
+        <a href="/behaviour" class="btn">Take the Test Again</a>
+    </div>
+
+    <script>
+        var data = [{
+            values: [
+                {{ (scores['openness'] * 100) }},
+                {{ (scores['conscientiousness'] * 100) }},
+                {{ (scores['extraversion'] * 100) }},
+                {{ (scores['agreeableness'] * 100) }},
+                {{ (scores['neuroticism'] * 100) }}
+            ],
+            labels: ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'],
+            type: 'pie'
+        }];
+
+        var layout = {
+            title: 'Big Five Personality Traits',
+            showlegend: true
+        };
+
+        Plotly.newPlot('piechart', data, layout);
+    </script>
+    </div>
+     <a href="{{ url_for('home') }}" class="btn">Back to Home</a>
+</body>
+</html>

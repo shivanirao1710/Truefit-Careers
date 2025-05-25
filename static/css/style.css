@@ -614,3 +614,109 @@ input[type="file"]:focus {
     
     
   }
+  /* Result List Styling */
+#result ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+}
+
+#result li {
+    background-color: #f8f9fa;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    padding: 16px 24px;
+    font-size: 18px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-width: 200px;
+    text-align: center;
+}
+
+#result li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+#result li strong {
+    display: block;
+    color: #470161;
+    font-size: 20px;
+    margin-bottom: 6px;
+}
+
+
+/* Behavioral Tag */
+#result p {
+    font-size: 20px;
+    font-weight: bold;
+    color: #420355;
+    margin-bottom: 15px;
+    text-align: center;
+    background-color: #f7f7f8;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: fit-content;
+    margin: 0 auto 20px auto;
+}
+
+#piechart {
+    width: 100%;
+    max-width: 800px;       /* Increased max width */
+    height: 500px;          /* Set a fixed height to avoid squishing */
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling for each question box */
+.question {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+    width: 80%;  /* Reduce width to 80% of the parent container */
+    max-width: 600px;  /* Optional: Set a max-width to limit the size on larger screens */
+    margin-left: auto;
+    margin-right: auto;  /* Center the questions */
+}
+
+/* Title of each question */
+.question p {
+    font-size: 16px;
+    font-weight: bold;
+    color: #300548;
+    margin-bottom: 8px;
+}
+
+/* Align the radio buttons horizontally */
+.question-options {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    width: 100%;
+}
+
+/* Style for the labels */
+.question label {
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+    display: inline-block;
+}
+
+/* Style for the radio buttons */
+.question input[type="radio"] {
+    margin-right: 3px;
+    transform: scale(1.1);
+    accent-color: #311756; /* Optional color */
+}
+
+

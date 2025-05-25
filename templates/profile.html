@@ -34,7 +34,7 @@
             <p><strong>Skills:</strong> {% for skill in data.skills.split(',') %}{{ skill }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
             <p><strong>Education:</strong> {{ data.education }}</p>
             <p><strong>Insights:</strong> {{ data.insights }}</p>
-            <p><strong>Behavior Tag:</strong></p>
+            <p><strong>Behavior Tag:</strong>{{data.behavioral_tag}}</p>
         </div>
     </div>
     <a href="{{ url_for('home') }}" class="btn">Back to Home</a>

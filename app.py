@@ -11,6 +11,7 @@ from sentence_transformers import SentenceTransformer
 import faiss
 import numpy as np
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
+import pickle
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a secure key
@@ -395,7 +396,7 @@ def chatbot_route():
 
     return render_template("chatbot.html", response=greeting_message, user_name=user_name)
 
-#RESUME
+#RESUME #PROFILE
 def get_resume_data(user_id):
     try:
         connection = get_db_connection()
@@ -403,7 +404,7 @@ def get_resume_data(user_id):
 
         # Query to get the most recent resume details using the user_id
         query = """
-            SELECT resume_id, name, email, skills, education, insights 
+            SELECT resume_id, name, email, skills, education, insights, behavioral_tag
             FROM resumes 
             WHERE user_id = %s 
             ORDER BY resume_id DESC 
@@ -424,7 +425,8 @@ def get_resume_data(user_id):
                 'email': result[2],
                 'skills': result[3],
                 'education': result[4],
-                'insights': result[5]
+                'insights': result[5],
+                'behavioral_tag': result[6]
             }
         else:
             return None
@@ -433,6 +435,129 @@ def get_resume_data(user_id):
         print("Error fetching data: ", e)
         return None
     
+
+#BEHAVIOUR
+# Load your trained Random Forest model
+model = pickle.load(open("rf_model.pkl", "rb"))
+
+# Function to fetch the questions from the database
+def fetch_questions():
+    conn = get_db_connection()
+    with conn.cursor() as cur:
+        cur.execute("SELECT id, question_text FROM questions ORDER BY id")
+        questions = cur.fetchall()
+    conn.close()
+    return questions
+
+# Function to save responses and results in the database
+def save_responses(user_id, answers, predicted_scores, behavioral_tag):
+    conn = get_db_connection()
+    with conn.cursor() as cur:
+        # Save responses (assuming 50 questions: answers is a list of 50 ints)
+        placeholders = ','.join([f"q{i+1}" for i in range(len(answers))])
+        values_placeholders = ','.join(['%s']*len(answers))
+        insert_resp = f"INSERT INTO responses (user_id, {placeholders}) VALUES (%s, {values_placeholders})"
+        cur.execute(insert_resp, [user_id] + answers)
+
+        # Save results
+        cur.execute(""" 
+            INSERT INTO results (user_id, openness, conscientiousness, extraversion, agreeableness, neuroticism, behavioral_tag)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (user_id,
+             predicted_scores['openness'],
+             predicted_scores['conscientiousness'],
+             predicted_scores['extraversion'],
+             predicted_scores['agreeableness'],
+             predicted_scores['neuroticism'],
+             behavioral_tag)
+        )
+        conn.commit()
+    conn.close()
+
+# Function to generate behavioral tag based on the highest Big Five score
+def get_behavioral_tag(predicted_scores):
+    # Find the trait with the highest score
+    max_trait = max(predicted_scores, key=predicted_scores.get)
+    
+    # Assign a behavioral tag based on the trait with the highest score
+    if max_trait == 'openness':
+        behavioral_tag = 'Creative'
+    elif max_trait == 'conscientiousness':
+        behavioral_tag = 'Organized'
+    elif max_trait == 'extraversion':
+        behavioral_tag = 'Extroverted'
+    elif max_trait == 'agreeableness':
+        behavioral_tag = 'Compassionate'
+    elif max_trait == 'neuroticism':
+        behavioral_tag = 'Neurotic'
+    
+    return behavioral_tag
+def store_behavioral_tag(user_id, behavioral_tag):
+    conn = get_db_connection()
+    with conn.cursor() as cur:
+        # Update the behavioral_tag in the resumes table
+        cur.execute("""
+            UPDATE resumes
+            SET behavioral_tag = %s
+            WHERE user_id = %s
+        """, (behavioral_tag, user_id))
+        conn.commit()
+    conn.close()
+
+@app.route('/behaviour', methods=['GET'])
+def behaviour():
+    # Check if the user is logged in (using session or token)
+    if 'user_id' not in session:
+        return redirect(url_for('login'))  # Redirect to login page if not logged in
+
+    # Fetch questions from the database
+    questions = fetch_questions()
+    
+    # Render the behavioural analyzer page with the questions
+    return render_template('behaviour.html', questions=questions)
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+
+    # Collect answers
+    answers = []
+    for i in range(1, 51):
+        ans = request.form.get(f'q{i}')
+        if ans is None or ans == '':
+            return "Please answer all questions!", 400
+        answers.append(int(ans))
+
+    # Predict personality trait scores using ML model
+    prediction = model.predict([answers])[0]
+
+    predicted_scores = {
+        'openness': float(prediction[0]),
+        'conscientiousness': float(prediction[1]),
+        'extraversion': float(prediction[2]),
+        'agreeableness': float(prediction[3]),
+        'neuroticism': float(prediction[4])
+    }
+
+    # Generate behavioral tag
+    behavioral_tag = get_behavioral_tag(predicted_scores)
+
+    # Save the behavioral tag into the resumes table
+    store_behavioral_tag(user_id, behavioral_tag)
+
+    # Optionally, save responses to another table if needed
+
+    return render_template(
+        'result.html',
+        scores=predicted_scores,
+        behavioral_tag=behavioral_tag,
+          
+    )
+
 # Route to display the profile page
 #PROFILE
 @app.route('/profile')
