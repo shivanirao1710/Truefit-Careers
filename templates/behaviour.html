@@ -50,22 +50,28 @@ h1 {
     <div class="upload-form">
     <h1>Big Five Personality Questionnaire</h1>
     <form action="/submit" method="post">
-
+    <div class="question-container">
         {% for id, question in questions %}
             <div class="question">
-    <p>{{ id }}. {{ question }}</p>
-    <div class="question-options">
-        <label><input type="radio" name="q{{ id }}" value="1" required>1</label>
-        <label><input type="radio" name="q{{ id }}" value="2">2</label>
-        <label><input type="radio" name="q{{ id }}" value="3">3</label>
-        <label><input type="radio" name="q{{ id }}" value="4">4</label>
-        <label><input type="radio" name="q{{ id }}" value="5">5</label>
-    </div>
-</div>
+                <p>{{ id }}. {{ question }}</p>
+                <div class="question-options">
+                    <label><input type="radio" name="q{{ id }}" value="1" required>1</label>
+                    <label><input type="radio" name="q{{ id }}" value="2">2</label>
+                    <label><input type="radio" name="q{{ id }}" value="3">3</label>
+                    <label><input type="radio" name="q{{ id }}" value="4">4</label>
+                    <label><input type="radio" name="q{{ id }}" value="5">5</label>
+                </div>
+            </div>
         {% endfor %}
+    </div>
 
+    <div style="text-align: center; margin-top: 20px;">
         <button type="submit">Submit</button>
-    </form>
+    </div>
+</form>
+
+   <a href="{{ url_for('result') }}" class="btn">See My Results</a>
+
     </div>
     <a href="{{ url_for('home') }}" class="btn">Back to Home</a>
     

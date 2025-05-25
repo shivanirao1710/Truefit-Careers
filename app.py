@@ -524,7 +524,15 @@ def submit():
 
     user_id = session['user_id']
 
-    # Collect answers
+    # Step 1: Delete previous responses and results for this user (optional: keep history if needed)
+    conn = get_db_connection()
+    with conn.cursor() as cur:
+        cur.execute("DELETE FROM responses WHERE user_id = %s", (user_id,))
+        cur.execute("DELETE FROM results WHERE user_id = %s", (user_id,))
+        conn.commit()
+    conn.close()
+
+    # Step 2: Collect answers
     answers = []
     for i in range(1, 51):
         ans = request.form.get(f'q{i}')
@@ -532,9 +540,8 @@ def submit():
             return "Please answer all questions!", 400
         answers.append(int(ans))
 
-    # Predict personality trait scores using ML model
+    # Step 3: Predict scores
     prediction = model.predict([answers])[0]
-
     predicted_scores = {
         'openness': float(prediction[0]),
         'conscientiousness': float(prediction[1]),
@@ -543,20 +550,57 @@ def submit():
         'neuroticism': float(prediction[4])
     }
 
-    # Generate behavioral tag
+    # Step 4: Tag + Save
     behavioral_tag = get_behavioral_tag(predicted_scores)
-
-    # Save the behavioral tag into the resumes table
+    save_responses(user_id, answers, predicted_scores, behavioral_tag)
     store_behavioral_tag(user_id, behavioral_tag)
-
-    # Optionally, save responses to another table if needed
 
     return render_template(
         'result.html',
         scores=predicted_scores,
-        behavioral_tag=behavioral_tag,
-          
+        behavioral_tag=behavioral_tag
     )
+
+
+@app.route('/result')
+def result():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+
+    # Inline fetch_latest_result logic
+    conn = get_db_connection()  # use your existing get_db_connection() function
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT openness, conscientiousness, extraversion, agreeableness, neuroticism, behavioral_tag
+        FROM results
+        WHERE user_id = %s
+        LIMIT 1
+    """, (user_id,))
+    
+    row = cur.fetchone()
+    conn.close()
+
+    if row:
+        scores = {
+            'openness': row[0],
+            'conscientiousness': row[1],
+            'extraversion': row[2],
+            'agreeableness': row[3],
+            'neuroticism': row[4]
+        }
+        behavioral_tag = row[5]
+    else:
+        return "No results found. Please take the test first."
+
+    return render_template(
+        'result.html',
+        scores=scores,
+        behavioral_tag=behavioral_tag
+    )
+
+
 
 # Route to display the profile page
 #PROFILE
