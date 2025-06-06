@@ -75,27 +75,27 @@ h1 {
         <br>
         <a href="/behaviour" class="btn">Take the Test Again</a>
     </div>
+<script>
+    var data = [{
+        values: [
+            {{ (scores['openness'] * 100) | tojson }},
+            {{ (scores['conscientiousness'] * 100) | tojson }},
+            {{ (scores['extraversion'] * 100) | tojson }},
+            {{ (scores['agreeableness'] * 100) | tojson }},
+            {{ (scores['neuroticism'] * 100) | tojson }}
+        ],
+        labels: ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'],
+        type: 'pie'
+    }];
 
-    <script>
-        var data = [{
-            values: [
-                {{ (scores['openness'] * 100) }},
-                {{ (scores['conscientiousness'] * 100) }},
-                {{ (scores['extraversion'] * 100) }},
-                {{ (scores['agreeableness'] * 100) }},
-                {{ (scores['neuroticism'] * 100) }}
-            ],
-            labels: ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'],
-            type: 'pie'
-        }];
+    var layout = {
+        title: 'Big Five Personality Traits',
+        showlegend: true
+    };
 
-        var layout = {
-            title: 'Big Five Personality Traits',
-            showlegend: true
-        };
+    Plotly.newPlot('piechart', data, layout);
+</script>
 
-        Plotly.newPlot('piechart', data, layout);
-    </script>
     </div>
      <a href="{{ url_for('home') }}" class="btn">Back to Home</a>
 </body>

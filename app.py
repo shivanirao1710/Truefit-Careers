@@ -19,7 +19,7 @@ app.secret_key = 'your_secret_key'  # Change this to a secure key
 # Load the LLM model for generating insights and ranking jobs
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 # Initialize SentenceTransformer model for semantic understanding
-model = SentenceTransformer('all-MiniLM-L6-v2')
+sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # Initialize GPT-2 for text generation (for rephrasing or fixing grammar)
 gpt_tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
@@ -241,7 +241,7 @@ def find_job_roles_by_skills(skills, top_n=5):
     skills_query = [skill.strip() for skill in skills_query]
     query = " ".join(skills_query)
     
-    query_embedding = model.encode([query])[0]
+    query_embedding = sentence_model.encode([query])[0]
     job_data = get_job_data_from_postgresql()
 
     faiss_index, job_titles = prepare_faiss_index(job_data)
@@ -259,7 +259,7 @@ def find_job_roles_by_skills(skills, top_n=5):
 def find_job_roles_by_job_role(job_role, top_n=5):
     """Find job roles by job role name"""
     job_role = job_role.lower().strip()
-    query_embedding = model.encode([job_role])[0]
+    query_embedding = sentence_model.encode([job_role])[0]
     job_data = get_job_data_from_postgresql()
 
     faiss_index, job_titles = prepare_faiss_index(job_data)
